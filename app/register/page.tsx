@@ -3,95 +3,199 @@
 import type React from "react"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import Link from "next/link"
-import { Box } from "lucide-react"
+import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { toast } from "@/components/ui/use-toast"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [userRole, setUserRole] = useState("customer")
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    fullName: "",
+    role: "customer",
+  })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleRoleChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, role: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, we would register the user here
+    setIsLoading(true)
 
-    // Redirect to login
-    router.push("/login")
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const supabase = getSupabaseBrowserClient()
+
+      // First create the auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            role: formData.role,
+          },
+        },
+      })
+
+      if (authError) {
+        throw authError
+      }
+
+      if (!authData.user) {
+        throw new Error("Failed to create user")
+      }
+
+      // Then create the user profile in our database
+      const { error: profileError } = await supabase.from("deli_users").insert({
+        id: authData.user.id,
+        email: formData.email,
+        full_name: formData.fullName,
+        role: formData.role,
+        status: "active",
+      })
+
+      if (profileError) {
+        throw profileError
+      }
+
+      // Create role-specific profile
+      if (formData.role === "customer") {
+        await supabase.from("deli_customer_profiles").insert({
+          user_id: authData.user.id,
+        })
+      } else if (formData.role === "agent") {
+        await supabase.from("deli_agent_profiles").insert({
+          user_id: authData.user.id,
+          vehicle_type: "Car",
+          license_number: "Pending",
+          rating: 5.0,
+          total_deliveries: 0,
+          available: false,
+        })
+      }
+
+      toast({
+        title: "Success",
+        description: "Account created successfully. Please sign in.",
+      })
+
+      router.push("/login?message=Account created. Please sign in.")
+    } catch (error: any) {
+      console.error("Registration error:", error)
+      toast({
+        title: "Error",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-2">
-            <Link href="/" className="flex items-center space-x-2">
-              <Box className="h-6 w-6" />
-              <span className="font-bold">DeliveryHub</span>
-            </Link>
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
-          <CardDescription className="text-center">Enter your information to create an account</CardDescription>
+          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+          <CardDescription>Enter your information to create an account</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first-name">First name</Label>
-                <Input id="first-name" placeholder="John" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name">Last name</Label>
-                <Input id="last-name" placeholder="Doe" required />
-              </div>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                name="fullName"
+                placeholder="John Doe"
+                required
+                value={formData.fullName}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={formData.email}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input id="confirm-password" type="password" required />
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
-              <Label>Account Type</Label>
-              <RadioGroup
-                defaultValue="customer"
-                value={userRole}
-                onValueChange={setUserRole}
-                className="flex flex-col space-y-1"
-              >
+              <Label>I am a:</Label>
+              <RadioGroup value={formData.role} onValueChange={handleRoleChange} className="flex space-x-4">
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="customer" id="r-customer" />
-                  <Label htmlFor="r-customer">Customer</Label>
+                  <RadioGroupItem value="customer" id="customer" />
+                  <Label htmlFor="customer">Customer</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="agent" id="r-agent" />
-                  <Label htmlFor="r-agent">Delivery Agent</Label>
+                  <RadioGroupItem value="agent" id="agent" />
+                  <Label htmlFor="agent">Delivery Agent</Label>
                 </div>
               </RadioGroup>
             </div>
-            <Button type="submit" className="w-full">
-              Register
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account"}
             </Button>
-          </form>
-        </CardContent>
-        <CardFooter>
-          <div className="text-sm text-muted-foreground text-center w-full">
-            Already have an account?{" "}
-            <Link href="/login" className="hover:text-primary underline underline-offset-4">
-              Login
-            </Link>
-          </div>
-        </CardFooter>
+            <div className="text-center text-sm">
+              Already have an account?{" "}
+              <Link href="/login" className="text-primary hover:underline">
+                Sign in
+              </Link>
+            </div>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   )

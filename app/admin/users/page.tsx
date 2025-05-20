@@ -7,115 +7,17 @@ import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Download, Plus, Search, UserCog } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getUsers, getAgents } from "@/lib/actions/users"
 
-const customers = [
-  {
-    id: "USR-001",
-    name: "Jackson Miller",
-    email: "jackson.miller@example.com",
-    phone: "(555) 123-4567",
-    orders: 12,
-    joined: "2024-10-15",
-    status: "Active",
-  },
-  {
-    id: "USR-002",
-    name: "Sophia Anderson",
-    email: "sophia.anderson@example.com",
-    phone: "(555) 234-5678",
-    orders: 8,
-    joined: "2024-11-02",
-    status: "Active",
-  },
-  {
-    id: "USR-003",
-    name: "William Kim",
-    email: "william.kim@example.com",
-    phone: "(555) 345-6789",
-    orders: 5,
-    joined: "2024-11-18",
-    status: "Active",
-  },
-  {
-    id: "USR-004",
-    name: "Emma Martinez",
-    email: "emma.martinez@example.com",
-    phone: "(555) 456-7890",
-    orders: 15,
-    joined: "2024-09-30",
-    status: "Active",
-  },
-  {
-    id: "USR-005",
-    name: "Liam Johnson",
-    email: "liam.johnson@example.com",
-    phone: "(555) 567-8901",
-    orders: 3,
-    joined: "2024-12-05",
-    status: "Inactive",
-  },
-]
+export default async function UsersPage() {
+  const [customers, agents, admins] = await Promise.all([getUsers("customer"), getAgents(), getUsers("admin")])
 
-const agents = [
-  {
-    id: "AGT-001",
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
-    phone: "(555) 987-6543",
-    deliveries: 142,
-    rating: 4.9,
-    joined: "2024-08-12",
-    status: "Active",
-  },
-  {
-    id: "AGT-002",
-    name: "Maria Garcia",
-    email: "maria.garcia@example.com",
-    phone: "(555) 876-5432",
-    deliveries: 137,
-    rating: 4.8,
-    joined: "2024-09-05",
-    status: "Active",
-  },
-  {
-    id: "AGT-003",
-    name: "David Lee",
-    email: "david.lee@example.com",
-    phone: "(555) 765-4321",
-    deliveries: 129,
-    rating: 4.9,
-    joined: "2024-09-18",
-    status: "Active",
-  },
-  {
-    id: "AGT-004",
-    name: "Sarah Wilson",
-    email: "sarah.wilson@example.com",
-    phone: "(555) 654-3210",
-    deliveries: 124,
-    rating: 4.7,
-    joined: "2024-10-01",
-    status: "Active",
-  },
-  {
-    id: "AGT-005",
-    name: "Michael Brown",
-    email: "michael.brown@example.com",
-    phone: "(555) 543-2109",
-    deliveries: 118,
-    rating: 4.8,
-    joined: "2024-10-15",
-    status: "Suspended",
-  },
-]
+  const statusColorMap: Record<string, string> = {
+    active: "bg-green-100 text-green-800 hover:bg-green-100/80",
+    inactive: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80",
+    suspended: "bg-red-100 text-red-800 hover:bg-red-100/80",
+  }
 
-const statusColorMap: Record<string, string> = {
-  Active: "bg-green-100 text-green-800 hover:bg-green-100/80",
-  Inactive: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80",
-  Suspended: "bg-red-100 text-red-800 hover:bg-red-100/80",
-}
-
-export default function UsersPage() {
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <AdminHeader title="User Management" />
@@ -171,7 +73,6 @@ export default function UsersPage() {
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead className="hidden md:table-cell">Phone</TableHead>
-                        <TableHead>Orders</TableHead>
                         <TableHead className="hidden md:table-cell">Joined</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -180,12 +81,13 @@ export default function UsersPage() {
                     <TableBody>
                       {customers.map((customer) => (
                         <TableRow key={customer.id}>
-                          <TableCell className="font-medium">{customer.id}</TableCell>
-                          <TableCell>{customer.name}</TableCell>
+                          <TableCell className="font-medium">{customer.id.substring(0, 8)}</TableCell>
+                          <TableCell>{customer.full_name}</TableCell>
                           <TableCell>{customer.email}</TableCell>
-                          <TableCell className="hidden md:table-cell">{customer.phone}</TableCell>
-                          <TableCell>{customer.orders}</TableCell>
-                          <TableCell className="hidden md:table-cell">{customer.joined}</TableCell>
+                          <TableCell className="hidden md:table-cell">{customer.phone || "—"}</TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            {new Date(customer.created_at).toLocaleDateString()}
+                          </TableCell>
                           <TableCell>
                             <Badge className={statusColorMap[customer.status]}>{customer.status}</Badge>
                           </TableCell>
@@ -261,7 +163,6 @@ export default function UsersPage() {
                         <TableHead className="hidden md:table-cell">Phone</TableHead>
                         <TableHead>Deliveries</TableHead>
                         <TableHead>Rating</TableHead>
-                        <TableHead className="hidden md:table-cell">Joined</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
@@ -269,13 +170,12 @@ export default function UsersPage() {
                     <TableBody>
                       {agents.map((agent) => (
                         <TableRow key={agent.id}>
-                          <TableCell className="font-medium">{agent.id}</TableCell>
-                          <TableCell>{agent.name}</TableCell>
+                          <TableCell className="font-medium">{agent.id.substring(0, 8)}</TableCell>
+                          <TableCell>{agent.full_name}</TableCell>
                           <TableCell>{agent.email}</TableCell>
-                          <TableCell className="hidden md:table-cell">{agent.phone}</TableCell>
-                          <TableCell>{agent.deliveries}</TableCell>
-                          <TableCell>{agent.rating}</TableCell>
-                          <TableCell className="hidden md:table-cell">{agent.joined}</TableCell>
+                          <TableCell className="hidden md:table-cell">{agent.phone || "—"}</TableCell>
+                          <TableCell>{agent.deli_agent_profiles?.[0]?.total_deliveries || 0}</TableCell>
+                          <TableCell>{agent.deli_agent_profiles?.[0]?.rating || "—"}</TableCell>
                           <TableCell>
                             <Badge className={statusColorMap[agent.status]}>{agent.status}</Badge>
                           </TableCell>
@@ -311,8 +211,46 @@ export default function UsersPage() {
               <CardTitle>Administrators</CardTitle>
               <CardDescription>Manage administrator accounts and permissions.</CardDescription>
             </CardHeader>
-            <CardContent className="h-[400px] flex items-center justify-center">
-              <p className="text-muted-foreground">Administrator management will appear here.</p>
+            <CardContent>
+              <div className="flex flex-col space-y-4">
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead className="hidden md:table-cell">Phone</TableHead>
+                        <TableHead className="hidden md:table-cell">Joined</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {admins.map((admin) => (
+                        <TableRow key={admin.id}>
+                          <TableCell className="font-medium">{admin.id.substring(0, 8)}</TableCell>
+                          <TableCell>{admin.full_name}</TableCell>
+                          <TableCell>{admin.email}</TableCell>
+                          <TableCell className="hidden md:table-cell">{admin.phone || "—"}</TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            {new Date(admin.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={statusColorMap[admin.status]}>{admin.status}</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <UserCog className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
