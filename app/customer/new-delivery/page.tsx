@@ -259,7 +259,7 @@ export default function NewDeliveryPage() {
                       <Label htmlFor="deliveryCity">City</Label>
                       <Input
                         id="deliveryCity"
-                        placeholder="Somewhere"
+                        placeholder="Lagos"
                         required
                         value={formData.deliveryCity}
                         onChange={handleChange}
@@ -269,7 +269,7 @@ export default function NewDeliveryPage() {
                       <Label htmlFor="deliveryState">State</Label>
                       <Input
                         id="deliveryState"
-                        placeholder="CA"
+                        placeholder="Lagos State"
                         required
                         value={formData.deliveryState}
                         onChange={handleChange}
@@ -279,10 +279,10 @@ export default function NewDeliveryPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="deliveryZip">ZIP Code</Label>
+                      <Label htmlFor="deliveryZip">Postal Code</Label>
                       <Input
                         id="deliveryZip"
-                        placeholder="67890"
+                        placeholder="100001"
                         required
                         value={formData.deliveryZip}
                         onChange={handleChange}
@@ -292,7 +292,7 @@ export default function NewDeliveryPage() {
                       <Label htmlFor="deliveryCountry">Country</Label>
                       <Input
                         id="deliveryCountry"
-                        placeholder="USA"
+                        placeholder="Nigeria"
                         required
                         value={formData.deliveryCountry}
                         onChange={handleChange}
@@ -388,7 +388,6 @@ export default function NewDeliveryPage() {
                       <Label htmlFor="packageWeight">Weight (lbs)</Label>
                       <Input
                         id="packageWeight"
-                        type="number"
                         placeholder="5"
                         required
                         value={formData.packageWeight}
@@ -396,10 +395,9 @@ export default function NewDeliveryPage() {
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="packageValue">Declared Value ($)</Label>
+                      <Label htmlFor="packageValue">Value ($)</Label>
                       <Input
                         id="packageValue"
-                        type="number"
                         placeholder="100"
                         required
                         value={formData.packageValue}
@@ -409,10 +407,10 @@ export default function NewDeliveryPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="packageDescription">Package Description</Label>
+                    <Label htmlFor="packageDescription">Description</Label>
                     <Textarea
                       id="packageDescription"
-                      placeholder="Briefly describe the contents of your package"
+                      placeholder="E.g., Books, clothes, electronics, etc."
                       required
                       value={formData.packageDescription}
                       onChange={handleChange}
@@ -424,35 +422,24 @@ export default function NewDeliveryPage() {
 
             <Separator />
 
-            <div className="flex justify-between">
-              {step > 1 ? (
-                <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
-                  Previous
+            <div className="flex justify-end gap-4">
+              {step > 1 && (
+                <Button variant="outline" onClick={() => setStep((prev) => prev - 1)} disabled={isSubmitting}>
+                  Back
                 </Button>
-              ) : (
-                <div></div>
               )}
-
               {step < 3 ? (
-                <Button type="button" onClick={() => setStep(step + 1)}>
+                <Button onClick={() => setStep((prev) => prev + 1)} disabled={isSubmitting}>
                   Next
                 </Button>
               ) : (
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit Request"}
+                  {isSubmitting ? "Submitting..." : "Submit Delivery Request"}
                 </Button>
               )}
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-between border-t pt-6">
-          <div className="flex space-x-2">
-            <div className={`h-2 w-2 rounded-full ${step >= 1 ? "bg-primary" : "bg-muted"}`}></div>
-            <div className={`h-2 w-2 rounded-full ${step >= 2 ? "bg-primary" : "bg-muted"}`}></div>
-            <div className={`h-2 w-2 rounded-full ${step >= 3 ? "bg-primary" : "bg-muted"}`}></div>
-          </div>
-          <div className="text-sm text-muted-foreground">Step {step} of 3</div>
-        </CardFooter>
       </Card>
     </div>
   )

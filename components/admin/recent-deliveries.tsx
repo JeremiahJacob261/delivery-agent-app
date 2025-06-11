@@ -70,7 +70,7 @@ export function RecentDeliveries() {
           <AvatarFallback>LJ</AvatarFallback>
         </Avatar>
         <div className="ml-4 space-y-1">
-          <p className="text-sm font-medium leading-none">Liam Johnson</p>
+          <p className="text-sm font-medium leading-none">Liam Olaoluwa</p>
           <p className="text-sm text-muted-foreground">444 Spruce St → 222 Fir Ln</p>
         </div>
         <div className="ml-auto font-medium">

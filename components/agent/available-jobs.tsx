@@ -65,7 +65,7 @@ const jobs = [
   },
   {
     id: "JOB-005",
-    customer: "Liam Johnson",
+    customer: "Liam Olaoluwa",
     pickup: "444 Spruce St, Noplace, USA",
     dropoff: "222 Fir Ln, Somewhereelse, USA",
     distance: "9.3 miles",

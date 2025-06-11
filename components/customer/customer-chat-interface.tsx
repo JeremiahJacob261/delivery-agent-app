@@ -26,7 +26,7 @@ interface ChatContact {
 const contacts: ChatContact[] = [
   {
     id: "contact1",
-    name: "Alex Johnson",
+    name: "Alex Olaoluwa",
     orderId: "ORD-001",
     lastMessage: "I should be there in about 15 minutes.",
     unread: true,
