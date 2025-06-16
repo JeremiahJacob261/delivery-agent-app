@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { CustomerHeader } from "@/components/customer-header"
 import { Button } from "@/components/ui/button"
@@ -13,46 +12,39 @@ import { Textarea } from "@/components/ui/textarea"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { toast } from "@/components/ui/use-toast"
 
 export default function NewDeliveryPage() {
   const router = useRouter()
-  const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
+    packageType: "",
+    packageWeight: "",
+    packageValue: "",
+    pickupName: "",
+    pickupPhone: "",
     pickupAddress: "",
     pickupCity: "",
     pickupState: "",
     pickupZip: "",
-    pickupCountry: "USA",
-    pickupInstructions: "",
+    pickupCountry: "",
+    deliveryName: "",
+    deliveryPhone: "",
     deliveryAddress: "",
     deliveryCity: "",
     deliveryState: "",
     deliveryZip: "",
-    deliveryCountry: "USA",
-    recipientName: "",
-    recipientPhone: "",
-    deliveryInstructions: "",
-    packageType: "small",
-    packageCategory: "light",
-    packageWeight: "5",
-    packageValue: "100",
-    packageDescription: "",
+    deliveryCountry: "",
+    urgency: "standard",
+    notes: "",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSelectChange = (id: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
-
-  const handleRadioChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, packageCategory: value }))
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,69 +52,8 @@ export default function NewDeliveryPage() {
     setIsSubmitting(true)
 
     try {
-      const supabase = getSupabaseBrowserClient()
-
-      // Get current user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to create a delivery",
-          variant: "destructive",
-        })
-        router.push("/login")
-        return
-      }
-
-      // Format addresses
-      const pickupAddress = `${formData.pickupAddress}, ${formData.pickupCity}, ${formData.pickupState} ${formData.pickupZip}, ${formData.pickupCountry}`
-      const dropoffAddress = `${formData.deliveryAddress}, ${formData.deliveryCity}, ${formData.deliveryState} ${formData.deliveryZip}, ${formData.deliveryCountry}`
-
-      // Create order
-      const { data: order, error: orderError } = await supabase
-        .from("deli_orders")
-        .insert({
-          customer_id: user.id,
-          status: "pending",
-          total_amount: Number.parseFloat(formData.packageValue) + 10, // Base fee + package value
-          items_count: 1,
-          pickup_address: pickupAddress,
-          dropoff_address: dropoffAddress,
-          notes: `Package Type: ${formData.packageType}, Category: ${formData.packageCategory}, Weight: ${formData.packageWeight}lbs, Description: ${formData.packageDescription}, Pickup Instructions: ${formData.pickupInstructions}, Delivery Instructions: ${formData.deliveryInstructions}, Recipient: ${formData.recipientName}, Recipient Phone: ${formData.recipientPhone}`,
-        })
-        .select()
-        .single()
-
-      if (orderError) {
-        throw orderError
-      }
-
-      // Create delivery
-      const { error: deliveryError } = await supabase.from("deli_deliveries").insert({
-        order_id: order.id,
-        status: "pending",
-        estimated_delivery_time: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
-      })
-
-      if (deliveryError) {
-        throw deliveryError
-      }
-
-      // Create payment record
-      const { error: paymentError } = await supabase.from("deli_payments").insert({
-        order_id: order.id,
-        customer_id: user.id,
-        amount: Number.parseFloat(formData.packageValue) + 10,
-        status: "pending",
-        payment_method: "credit_card",
-      })
-
-      if (paymentError) {
-        throw paymentError
-      }
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       toast({
         title: "Success",
@@ -131,10 +62,9 @@ export default function NewDeliveryPage() {
 
       router.push("/customer/dashboard")
     } catch (error: any) {
-      console.error("Error creating delivery:", error)
       toast({
         title: "Error",
-        description: error.message || "An error occurred while creating your delivery",
+        description: "Failed to create delivery request",
         variant: "destructive",
       })
     } finally {
@@ -142,305 +72,332 @@ export default function NewDeliveryPage() {
     }
   }
 
+  const quickFill = () => {
+    setFormData({
+      packageType: "Documents",
+      packageWeight: "0.5",
+      packageValue: "5000",
+      pickupName: "Adebayo Okonkwo",
+      pickupPhone: "+234-801-234-5678",
+      pickupAddress: "123 Victoria Island Street",
+      pickupCity: "Lagos",
+      pickupState: "Lagos State",
+      pickupZip: "100001",
+      pickupCountry: "Nigeria",
+      deliveryName: "Fatima Abdullahi",
+      deliveryPhone: "+234-802-345-6789",
+      deliveryAddress: "456 Ikeja Avenue",
+      deliveryCity: "Ikeja",
+      deliveryState: "Lagos State",
+      deliveryZip: "100002",
+      deliveryCountry: "Nigeria",
+      urgency: "standard",
+      notes: "Handle with care - important documents",
+    })
+  }
+
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <CustomerHeader title="New Delivery Request" />
+    <div className="min-h-screen bg-gray-50">
+      <CustomerHeader />
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Create New Delivery</h1>
+            <p className="text-gray-600 mt-2">Fill in the details for your delivery request</p>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={quickFill}
+              className="mt-2"
+            >
+              Quick Fill (Demo)
+            </Button>
+          </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Create a Delivery Request</CardTitle>
-          <CardDescription>Fill out the form below to request a new delivery.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {step === 1 && (
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Pickup Information</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Enter the address where the package will be picked up.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="pickupAddress">Street Address</Label>
-                    <Input
-                      id="pickupAddress"
-                      placeholder="123 Main St"
-                      required
-                      value={formData.pickupAddress}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="pickupCity">City</Label>
-                      <Input
-                        id="pickupCity"
-                        placeholder="Anytown"
-                        required
-                        value={formData.pickupCity}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="pickupState">State</Label>
-                      <Input
-                        id="pickupState"
-                        placeholder="CA"
-                        required
-                        value={formData.pickupState}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="pickupZip">ZIP Code</Label>
-                      <Input
-                        id="pickupZip"
-                        placeholder="12345"
-                        required
-                        value={formData.pickupZip}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="pickupCountry">Country</Label>
-                      <Input
-                        id="pickupCountry"
-                        placeholder="USA"
-                        required
-                        value={formData.pickupCountry}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="pickupInstructions">Special Instructions (Optional)</Label>
-                    <Textarea
-                      id="pickupInstructions"
-                      placeholder="E.g., Ring doorbell, call upon arrival, etc."
-                      value={formData.pickupInstructions}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Delivery Information</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Enter the address where the package will be delivered.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="deliveryAddress">Street Address</Label>
-                    <Input
-                      id="deliveryAddress"
-                      placeholder="456 Oak Ave"
-                      required
-                      value={formData.deliveryAddress}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="deliveryCity">City</Label>
-                      <Input
-                        id="deliveryCity"
-                        placeholder="Lagos"
-                        required
-                        value={formData.deliveryCity}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="deliveryState">State</Label>
-                      <Input
-                        id="deliveryState"
-                        placeholder="Lagos State"
-                        required
-                        value={formData.deliveryState}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="deliveryZip">Postal Code</Label>
-                      <Input
-                        id="deliveryZip"
-                        placeholder="100001"
-                        required
-                        value={formData.deliveryZip}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="deliveryCountry">Country</Label>
-                      <Input
-                        id="deliveryCountry"
-                        placeholder="Nigeria"
-                        required
-                        value={formData.deliveryCountry}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="recipientName">Recipient Name</Label>
-                    <Input
-                      id="recipientName"
-                      placeholder="John Doe"
-                      required
-                      value={formData.recipientName}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="recipientPhone">Recipient Phone</Label>
-                    <Input
-                      id="recipientPhone"
-                      placeholder="(555) 123-4567"
-                      required
-                      value={formData.recipientPhone}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="deliveryInstructions">Special Instructions (Optional)</Label>
-                    <Textarea
-                      id="deliveryInstructions"
-                      placeholder="E.g., Leave at door, signature required, etc."
-                      value={formData.deliveryInstructions}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Package Information</h3>
-                  <p className="text-sm text-muted-foreground">Provide details about the package you want to send.</p>
-                </div>
-
-                <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Package Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Package Information</CardTitle>
+                <CardDescription>Tell us about what you're sending</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="packageType">Package Type</Label>
-                    <Select
-                      value={formData.packageType}
-                      onValueChange={(value) => handleSelectChange("packageType", value)}
-                    >
-                      <SelectTrigger id="packageType">
-                        <SelectValue placeholder="Select package type" />
+                    <Select onValueChange={(value) => handleSelectChange("packageType", value)} value={formData.packageType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="small">Small (up to 5 lbs)</SelectItem>
-                        <SelectItem value="medium">Medium (5-15 lbs)</SelectItem>
-                        <SelectItem value="large">Large (15-30 lbs)</SelectItem>
-                        <SelectItem value="extra-large">Extra Large (30+ lbs)</SelectItem>
+                        <SelectItem value="Documents">Documents</SelectItem>
+                        <SelectItem value="Electronics">Electronics</SelectItem>
+                        <SelectItem value="Clothing">Clothing</SelectItem>
+                        <SelectItem value="Food">Food</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div className="grid gap-2">
-                    <Label>Package Category</Label>
-                    <RadioGroup value={formData.packageCategory} onValueChange={handleRadioChange}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="light" id="light" />
-                        <Label htmlFor="light">Light</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="medium" id="medium" />
-                        <Label htmlFor="medium">Medium</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="heavy" id="heavy" />
-                        <Label htmlFor="heavy">Heavy</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="fragile" id="fragile" />
-                        <Label htmlFor="fragile">Fragile</Label>
-                      </div>
-                    </RadioGroup>
+                    <Label htmlFor="packageWeight">Weight (kg)</Label>
+                    <Input
+                      id="packageWeight"
+                      name="packageWeight"
+                      type="number"
+                      step="0.1"
+                      placeholder="0.5"
+                      value={formData.packageWeight}
+                      onChange={handleChange}
+                    />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="packageWeight">Weight (lbs)</Label>
-                      <Input
-                        id="packageWeight"
-                        placeholder="5"
-                        required
-                        value={formData.packageWeight}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="packageValue">Value ($)</Label>
-                      <Input
-                        id="packageValue"
-                        placeholder="100"
-                        required
-                        value={formData.packageValue}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
                   <div className="grid gap-2">
-                    <Label htmlFor="packageDescription">Description</Label>
-                    <Textarea
-                      id="packageDescription"
-                      placeholder="E.g., Books, clothes, electronics, etc."
-                      required
-                      value={formData.packageDescription}
+                    <Label htmlFor="packageValue">Value (₦)</Label>
+                    <Input
+                      id="packageValue"
+                      name="packageValue"
+                      type="number"
+                      placeholder="5000"
+                      value={formData.packageValue}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
-              </div>
-            )}
+              </CardContent>
+            </Card>
 
-            <Separator />
+            {/* Pickup Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Pickup Information</CardTitle>
+                <CardDescription>Where should we collect the package?</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupName">Contact Name</Label>
+                    <Input
+                      id="pickupName"
+                      name="pickupName"
+                      placeholder="Adebayo Okonkwo"
+                      value={formData.pickupName}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupPhone">Phone Number</Label>
+                    <Input
+                      id="pickupPhone"
+                      name="pickupPhone"
+                      type="tel"
+                      placeholder="+234-801-234-5678"
+                      value={formData.pickupPhone}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="pickupAddress">Street Address</Label>
+                  <Input
+                    id="pickupAddress"
+                    name="pickupAddress"
+                    placeholder="123 Victoria Island Street"
+                    value={formData.pickupAddress}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupCity">City</Label>
+                    <Input
+                      id="pickupCity"
+                      name="pickupCity"
+                      placeholder="Lagos"
+                      value={formData.pickupCity}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupState">State</Label>
+                    <Input
+                      id="pickupState"
+                      name="pickupState"
+                      placeholder="Lagos State"
+                      value={formData.pickupState}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupZip">Postal Code</Label>
+                    <Input
+                      id="pickupZip"
+                      name="pickupZip"
+                      placeholder="100001"
+                      value={formData.pickupZip}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="pickupCountry">Country</Label>
+                    <Input
+                      id="pickupCountry"
+                      name="pickupCountry"
+                      placeholder="Nigeria"
+                      value={formData.pickupCountry}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex justify-end gap-4">
-              {step > 1 && (
-                <Button variant="outline" onClick={() => setStep((prev) => prev - 1)} disabled={isSubmitting}>
-                  Back
-                </Button>
-              )}
-              {step < 3 ? (
-                <Button onClick={() => setStep((prev) => prev + 1)} disabled={isSubmitting}>
-                  Next
-                </Button>
-              ) : (
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit Delivery Request"}
-                </Button>
-              )}
-            </div>
+            {/* Delivery Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Delivery Information</CardTitle>
+                <CardDescription>Where should we deliver the package?</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="deliveryName">Contact Name</Label>
+                    <Input
+                      id="deliveryName"
+                      name="deliveryName"
+                      placeholder="Fatima Abdullahi"
+                      value={formData.deliveryName}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="deliveryPhone">Phone Number</Label>
+                    <Input
+                      id="deliveryPhone"
+                      name="deliveryPhone"
+                      type="tel"
+                      placeholder="+234-802-345-6789"
+                      value={formData.deliveryPhone}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="deliveryAddress">Street Address</Label>
+                  <Input
+                    id="deliveryAddress"
+                    name="deliveryAddress"
+                    placeholder="456 Ikeja Avenue"
+                    value={formData.deliveryAddress}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="deliveryCity">City</Label>
+                    <Input
+                      id="deliveryCity"
+                      name="deliveryCity"
+                      placeholder="Ikeja"
+                      value={formData.deliveryCity}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="deliveryState">State</Label>
+                    <Input
+                      id="deliveryState"
+                      name="deliveryState"
+                      placeholder="Lagos State"
+                      value={formData.deliveryState}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="deliveryZip">Postal Code</Label>
+                    <Input
+                      id="deliveryZip"
+                      name="deliveryZip"
+                      placeholder="100002"
+                      value={formData.deliveryZip}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="deliveryCountry">Country</Label>
+                    <Input
+                      id="deliveryCountry"
+                      name="deliveryCountry"
+                      placeholder="Nigeria"
+                      value={formData.deliveryCountry}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Delivery Options */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Delivery Options</CardTitle>
+                <CardDescription>Choose your delivery preferences</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4">
+                  <Label>Delivery Speed</Label>
+                  <RadioGroup value={formData.urgency} onValueChange={(value) => handleSelectChange("urgency", value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="standard" id="standard" />
+                      <Label htmlFor="standard">Standard (2-3 days) - ₦1,500</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="express" id="express" />
+                      <Label htmlFor="express">Express (1-2 days) - ₦3,000</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="urgent" id="urgent" />
+                      <Label htmlFor="urgent">Same Day - ₦5,000</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="notes">Special Instructions</Label>
+                  <Textarea
+                    id="notes"
+                    name="notes"
+                    placeholder="Any special handling instructions..."
+                    value={formData.notes}
+                    onChange={handleChange}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-semibold">Total Cost:</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    ₦{formData.urgency === "urgent" ? "5,000" : formData.urgency === "express" ? "3,000" : "1,500"}
+                  </span>
+                </div>
+                <Separator className="my-4" />
+                <div className="flex gap-4">
+                  <Button type="button" variant="outline" className="flex-1" onClick={() => router.back()}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating..." : "Create Delivery"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

@@ -124,7 +124,6 @@ export function AvailableJobs() {
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <div className="flex flex-col items-center justify-center p-2 bg-muted rounded-md">
-                    <DollarSign className="h-4 w-4 mb-1 text-muted-foreground" />
                     <span className="text-sm font-medium">{job.pay}</span>
                   </div>
                   <div className="flex flex-col items-center justify-center p-2 bg-muted rounded-md">
@@ -201,7 +200,6 @@ export function AvailableJobs() {
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <DollarSign className="h-4 w-4 mr-2 mt-0.5 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Payment</p>
                     <p className="text-sm text-muted-foreground">{selectedJob.pay}</p>

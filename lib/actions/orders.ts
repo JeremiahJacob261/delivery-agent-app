@@ -1,122 +1,20 @@
 "use server"
-
-import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { revalidatePath } from "next/cache"
+import { dummyOrders } from "@/lib/dummy-data"
 
 export async function getOrders() {
-  const supabase = createServerSupabaseClient()
-
-  const { data, error } = await supabase
-    .from("deli_orders")
-    .select(`
-      id,
-      created_at,
-      updated_at,
-      status,
-      total_amount,
-      items_count,
-      pickup_address,
-      dropoff_address,
-      notes,
-      customer_id,
-      deli_users (
-        full_name,
-        email,
-        phone
-      )
-    `)
-    .order("created_at", { ascending: false })
-
-  if (error) {
-    console.error("Error fetching orders:", error)
-    throw new Error("Failed to fetch orders")
-  }
-
-  return data
+  return dummyOrders
 }
 
 export async function getOrderById(id: string) {
-  const supabase = createServerSupabaseClient()
-
-  const { data, error } = await supabase
-    .from("deli_orders")
-    .select(`
-      id,
-      created_at,
-      updated_at,
-      status,
-      total_amount,
-      items_count,
-      pickup_address,
-      dropoff_address,
-      notes,
-      customer_id,
-      deli_users (
-        full_name,
-        email,
-        phone
-      ),
-      deli_deliveries (
-        id,
-        status,
-        agent_id,
-        pickup_time,
-        delivery_time,
-        estimated_delivery_time,
-        deli_users (
-          full_name,
-          phone
-        )
-      ),
-      deli_payments (
-        id,
-        amount,
-        status,
-        payment_method,
-        created_at,
-        transaction_id
-      )
-    `)
-    .eq("id", id)
-    .single()
-
-  if (error) {
-    console.error("Error fetching order:", error)
-    throw new Error("Failed to fetch order")
+  const order = dummyOrders.find(o => o.id === id)
+  if (!order) {
+    throw new Error("Order not found")
   }
-
-  return data
+  return order
 }
 
 export async function getCustomerOrders(customerId: string) {
-  const supabase = createServerSupabaseClient()
-
-  const { data, error } = await supabase
-    .from("deli_orders")
-    .select(`
-      id,
-      created_at,
-      updated_at,
-      status,
-      total_amount,
-      items_count,
-      pickup_address,
-      dropoff_address,
-      deli_deliveries (
-        id,
-        status,
-        estimated_delivery_time
-      )
-    `)
-    .eq("customer_id", customerId)
-    .order("created_at", { ascending: false })
-
-  if (error) {
-    console.error("Error fetching customer orders:", error)
-    throw new Error("Failed to fetch customer orders")
-  }
-
-  return data
+  return dummyOrders.filter(order => order.customer_id === customerId)
 }
 
 export async function createOrder(orderData: {
@@ -127,36 +25,23 @@ export async function createOrder(orderData: {
   dropoff_address: string
   notes?: string
 }) {
-  const supabase = createServerSupabaseClient()
-
-  const { data, error } = await supabase.from("deli_orders").insert(orderData).select().single()
-
-  if (error) {
-    console.error("Error creating order:", error)
-    throw new Error("Failed to create order")
+  const newOrder = {
+    id: `order-${Date.now()}`,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    status: "pending" as const,
+    ...orderData,
+    deli_users: {
+      full_name: "Customer Name",
+      email: "customer@example.com",
+      phone: "+234-800-000-0000"
+    }
   }
-
-  revalidatePath("/customer/dashboard")
-  revalidatePath("/admin/orders")
-  return data
+  
+  return newOrder
 }
 
 export async function updateOrderStatus(id: string, status: "pending" | "processing" | "delivered" | "cancelled") {
-  const supabase = createServerSupabaseClient()
-
-  const { error } = await supabase
-    .from("deli_orders")
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", id)
-
-  if (error) {
-    console.error("Error updating order status:", error)
-    throw new Error("Failed to update order status")
-  }
-
-  revalidatePath("/admin/orders")
-  revalidatePath(`/admin/orders/${id}`)
-  revalidatePath("/customer/dashboard")
-  revalidatePath("/customer/deliveries")
+  // Simulate update
   return { success: true }
 }
