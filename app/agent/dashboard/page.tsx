@@ -23,7 +23,7 @@ export default function AgentDashboard() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$125.50</div>
+                <div className="text-2xl font-bold">₦125.50</div>
                 <p className="text-xs text-muted-foreground">+$42.50 from yesterday</p>
               </CardContent>
             </Card>
@@ -135,7 +135,7 @@ export default function AgentDashboard() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$875.25</div>
+                <div className="text-2xl font-bold">₦875.25</div>
                 <p className="text-xs text-muted-foreground">+$125.50 from last week</p>
               </CardContent>
             </Card>

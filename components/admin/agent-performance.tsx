@@ -6,11 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 
 const topAgents = [
-  { name: "Alex Olaoluwa", deliveries: 142, rating: 4.9, onTime: "98%", earnings: "$3,450" },
-  { name: "Maria Garcia", deliveries: 137, rating: 4.8, onTime: "97%", earnings: "$3,280" },
-  { name: "David Lee", deliveries: 129, rating: 4.9, onTime: "99%", earnings: "$3,100" },
-  { name: "Sarah Wilson", deliveries: 124, rating: 4.7, onTime: "96%", earnings: "$2,980" },
-  { name: "Michael Brown", deliveries: 118, rating: 4.8, onTime: "97%", earnings: "$2,850" },
+  { name: "Alex Olaoluwa", deliveries: 142, rating: 4.9, onTime: "98%", earnings: "₦3,450" },
+  { name: "Maria Garcia", deliveries: 137, rating: 4.8, onTime: "97%", earnings: "₦3,280" },
+  { name: "David Lee", deliveries: 129, rating: 4.9, onTime: "99%", earnings: "₦3,100" },
+  { name: "Sarah Wilson", deliveries: 124, rating: 4.7, onTime: "96%", earnings: "₦2,980" },
+  { name: "Michael Brown", deliveries: 118, rating: 4.8, onTime: "97%", earnings: "₦2,850" },
 ]
 
 const data = [

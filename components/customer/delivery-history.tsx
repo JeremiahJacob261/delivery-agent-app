@@ -8,7 +8,7 @@ const deliveries = [
     from: "555 Cedar Ln, Anywhere, USA",
     to: "777 Birch Rd, Someplace, USA",
     status: "Delivered",
-    cost: "$22.00",
+    cost: "₦22.00",
   },
   {
     id: "ORD-004",
@@ -16,7 +16,7 @@ const deliveries = [
     from: "888 Elm St, Othertown, USA",
     to: "999 Walnut Ave, Elsewhere, USA",
     status: "Cancelled",
-    cost: "$15.25",
+    cost: "₦15.25",
   },
   {
     id: "ORD-005",
@@ -24,7 +24,7 @@ const deliveries = [
     from: "444 Spruce St, Noplace, USA",
     to: "222 Fir Ln, Somewhereelse, USA",
     status: "Delivered",
-    cost: "$27.50",
+    cost: "₦27.50",
   },
   {
     id: "ORD-006",
@@ -32,7 +32,7 @@ const deliveries = [
     from: "111 Ash Dr, Newtown, USA",
     to: "333 Willow Ct, Oldtown, USA",
     status: "Delivered",
-    cost: "$19.75",
+    cost: "₦19.75",
   },
   {
     id: "ORD-007",
@@ -40,7 +40,7 @@ const deliveries = [
     from: "666 Poplar Rd, Uptown, USA",
     to: "888 Sycamore Ave, Downtown, USA",
     status: "Delivered",
-    cost: "$31.25",
+    cost: "₦31.25",
   },
 ]
 

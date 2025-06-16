@@ -5,7 +5,7 @@ const payments = [
   {
     id: "PAY-001",
     date: "2025-01-01",
-    amount: "$875.25",
+    amount: "₦875.25",
     deliveries: 35,
     period: "Dec 16-31, 2024",
     status: "Completed",
@@ -13,7 +13,7 @@ const payments = [
   {
     id: "PAY-002",
     date: "2024-12-15",
-    amount: "$925.50",
+    amount: "₦925.50",
     deliveries: 38,
     period: "Dec 1-15, 2024",
     status: "Completed",
@@ -21,7 +21,7 @@ const payments = [
   {
     id: "PAY-003",
     date: "2024-12-01",
-    amount: "$850.75",
+    amount: "₦850.75",
     deliveries: 34,
     period: "Nov 16-30, 2024",
     status: "Completed",
@@ -29,7 +29,7 @@ const payments = [
   {
     id: "PAY-004",
     date: "2024-11-15",
-    amount: "$900.25",
+    amount: "₦900.25",
     deliveries: 37,
     period: "Nov 1-15, 2024",
     status: "Completed",
@@ -37,7 +37,7 @@ const payments = [
   {
     id: "PAY-005",
     date: "2024-11-01",
-    amount: "$825.50",
+    amount: "₦825.50",
     deliveries: 33,
     period: "Oct 16-31, 2024",
     status: "Completed",

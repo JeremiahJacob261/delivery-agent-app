@@ -13,7 +13,7 @@ const transactions = [
     id: "TRX-001",
     orderId: "ORD-001",
     date: "2025-01-10",
-    amount: "$24.99",
+    amount: "₦24.99",
     method: "Credit Card (****4567)",
     status: "Completed",
   },
@@ -21,7 +21,7 @@ const transactions = [
     id: "TRX-002",
     orderId: "ORD-002",
     date: "2025-01-09",
-    amount: "$42.50",
+    amount: "₦42.50",
     method: "PayPal",
     status: "Completed",
   },
@@ -29,7 +29,7 @@ const transactions = [
     id: "TRX-003",
     orderId: "ORD-003",
     date: "2025-01-09",
-    amount: "$18.75",
+    amount: "₦18.75",
     method: "Credit Card (****4567)",
     status: "Completed",
   },
@@ -37,7 +37,7 @@ const transactions = [
     id: "TRX-004",
     orderId: "ORD-004",
     date: "2025-01-08",
-    amount: "$65.20",
+    amount: "₦65.20",
     method: "Debit Card (****7890)",
     status: "Refunded",
   },
@@ -45,7 +45,7 @@ const transactions = [
     id: "TRX-005",
     orderId: "ORD-005",
     date: "2025-01-08",
-    amount: "$37.99",
+    amount: "₦37.99",
     method: "Credit Card (****4567)",
     status: "Completed",
   },
@@ -53,7 +53,7 @@ const transactions = [
     id: "TRX-006",
     orderId: "ORD-006",
     date: "2025-01-07",
-    amount: "$29.50",
+    amount: "₦29.50",
     method: "PayPal",
     status: "Completed",
   },
@@ -61,7 +61,7 @@ const transactions = [
     id: "TRX-007",
     orderId: "ORD-007",
     date: "2025-01-07",
-    amount: "$52.25",
+    amount: "₦52.25",
     method: "Credit Card (****4567)",
     status: "Pending",
   },
@@ -86,7 +86,7 @@ export default function PaymentsPage() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$271.18</div>
+            <div className="text-2xl font-bold">₦271.18</div>
             <p className="text-xs text-muted-foreground">Across 7 deliveries</p>
           </CardContent>
         </Card>
@@ -96,7 +96,7 @@ export default function PaymentsPage() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$38.74</div>
+            <div className="text-2xl font-bold">₦38.74</div>
             <p className="text-xs text-muted-foreground">Per delivery</p>
           </CardContent>
         </Card>
@@ -106,7 +106,7 @@ export default function PaymentsPage() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45.00</div>
+            <div className="text-2xl font-bold">₦45.00</div>
             <p className="text-xs text-muted-foreground">With membership</p>
           </CardContent>
         </Card>

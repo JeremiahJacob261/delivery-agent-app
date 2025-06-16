@@ -74,7 +74,7 @@ export default async function OrdersPage() {
                       <TableCell>
                         <Badge className={statusColorMap[order.status]}>{order.status}</Badge>
                       </TableCell>
-                      <TableCell>${order.total_amount.toFixed(2)}</TableCell>
+                      <TableCell>₦{order.total_amount.toFixed(2)}</TableCell>
                       <TableCell>{order.items_count}</TableCell>
                       <TableCell className="hidden md:table-cell max-w-[200px] truncate">
                         {order.dropoff_address}

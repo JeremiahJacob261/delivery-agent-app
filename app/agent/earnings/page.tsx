@@ -16,7 +16,7 @@ export default function EarningsPage() {
             <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
            </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$3,450.75</div>
+            <div className="text-2xl font-bold">₦3,450.75</div>
             <p className="text-xs text-muted-foreground">This month</p>
           </CardContent>
         </Card>
@@ -26,7 +26,7 @@ export default function EarningsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$24.30</div>
+            <div className="text-2xl font-bold">₦24.30</div>
             <p className="text-xs text-muted-foreground">+$1.20 from last month</p>
           </CardContent>
         </Card>
@@ -36,7 +36,7 @@ export default function EarningsPage() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$875.25</div>
+            <div className="text-2xl font-bold">₦875.25</div>
             <p className="text-xs text-muted-foreground">Scheduled for Jan 15</p>
           </CardContent>
         </Card>
